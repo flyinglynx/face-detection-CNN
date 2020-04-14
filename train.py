@@ -70,8 +70,6 @@ for epoch in range(EPOCHS):
         print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
                    .format(epoch+1, EPOCHS, i+1, total_step, loss.item()))
         
-if(input("save model? y/n:")=="y"):
-    torch.save(model,'trained_model/CNNmodel.pt')
 
 '''
 查看测试集的表现
@@ -96,3 +94,5 @@ with torch.no_grad():   #测试集中不需要计算梯度
 
     print('Accuracy : {} %'.format(100 * correct / total))
 
+if(input("save model? y/n:")=="y"):
+    torch.save(model,'trained_model/CNNmodel.pt')
