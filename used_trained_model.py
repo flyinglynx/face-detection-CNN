@@ -14,10 +14,14 @@ testImg = cv2.resize(testImg,(100,100),interpolation = cv2.INTER_AREA)
 testImg = testImg/255.0
 testImg = testImg.astype(np.float32)
 
-inputTensor = torch.from_numpy(testImg)
-inputTensor = inputTensor.to(device)
+with torch.no_grad():
+    inputTensor = torch.from_numpy(testImg)
+    inputTensor = inputTensor.to(device)
+    inputTensor= inputTensor.view(1,1,100,100)
+    
+    out = model(inputTensor)
+    out = out.cpu()
+    out = out.numpy()
 
-inputTensor= inputTensor.view(1,1,100,100)
-
-print(model(inputTensor))
-
+print(out)
+predict = np.argmax(out)
