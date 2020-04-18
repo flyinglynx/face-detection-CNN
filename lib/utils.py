@@ -1,10 +1,10 @@
 import cv2
 import numpy as np
 import os
-
 import torch
+import lib.SlidingWindow as sw
 
-def loadImages(category,width,height):
+def loadImages(category,width,height,type_="gray"):
     if category == "positive":
         path = "datasets/positive"
     elif category == "negative":
@@ -21,11 +21,22 @@ def loadImages(category,width,height):
     
     images = []
     for filename in names:
-        img = cv2.imread(path+'/'+filename,0)
+        if type_ == "gray":
+            img = cv2.imread(path+'/'+filename,0)
+        elif type_ == "RGB":
+            img = cv2.imread(path+'/'+filename)
+        else:
+            print("Unidentified image type.")
+            return None
+			
         img = cv2.resize(img, (height,width),interpolation = cv2.INTER_AREA)
         img = img/255.0
         img = img.astype(np.float32)
-        img=img.reshape(1,width,height)
+        
+        if type_ == "RGB":
+            img= np.vstack((img[:,:,0],img[:,:,1],img[:,:,2]))
+        elif type_ = "gray":
+            img = np.reshape(1,height,width)
         images.append(img)
 
     return np.array(images)
@@ -40,6 +51,7 @@ class faceDetector():
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.height=height
         self.width = width
+        self.slidingWindow = None
         if model_name == "forward CNN":
             self.detectModel = torch.load(model_path)
             self.detectModel = self.detectModel.to(self.device)
@@ -59,6 +71,27 @@ class faceDetector():
             out = out.numpy()
         
         return out[0]
+	#def setSildingWindow(self,imgH,):
+		#(self,imgW,imgH,wW=200,wH=200,vStride=50,hStride=50)
+    def locateFace(self,img):
+	    #初始化滑窗检测器
+        h,w = img.shape
+        window = sw.SlidingWindow(imgW = w,imgH = h,wW = 200,wH = 200,vStride = 30,hStride=30)
+        window.resetWindow()
+		
+		#建立一个列表存储可能存在人脸的位置
+        boundingBox = []
+        box = window.nextWindowPosition()
+    
+        while(box is not None):
+            x1,x2,y1,y2 = box
+            predict = self.detect(img[y1:y2,x1:x2])        
+            if np.argmax(predict)==1:
+                boundingBox.append([x1,x2,y1,y2,predict[1]])
+            box = window.nextWindowPosition()
+		
+        box = NMS(box) #非极大值抑制，去除一些重叠的或是几率不高的bounding box
+        return box
 
 def NMS(box):
     

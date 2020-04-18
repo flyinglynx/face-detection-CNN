@@ -22,8 +22,12 @@ while(cap.isOpened()):#循环读取每一帧
     boundingBox = window.nextWindowPosition()
     
     while(boundingBox is not None):
+<<<<<<< HEAD
         x1,y1,x2,y2 = boundingBox
         predict = detector.detect(gray_image[y1:y2,x1:x2])        
+=======
+        predict = detector.detect()        
+>>>>>>> ab4d9e5f9d8172563f5794dad6655aa1eca703c1
         if np.argmax(predict)==1:
             bgr_image = cv2.rectangle(bgr_image,(x1,y1),(x2,y2),(0,255,0))
             #cv2.imshow("debug",ROI)
