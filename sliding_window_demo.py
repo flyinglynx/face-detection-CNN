@@ -17,10 +17,10 @@ while(cap.isOpened()):#循环读取每一帧
     h,w = gray_image.shape
     
     window.resetWindow()
-    ROI,cord = window.nextWindow(gray_image)
+    boundingBox = window.nextWindowPosition()
     
-    while(cord != 0):
-        predict = detector.detect(ROI)        
+    while(boundingBox is not None):
+        predict = detector.detect()        
         if np.argmax(predict)==1:
             bgr_image = cv2.rectangle(bgr_image,(cord[0],cord[1]),(cord[2],cord[3]),(0,255,0))
             #cv2.imshow("debug",ROI)
