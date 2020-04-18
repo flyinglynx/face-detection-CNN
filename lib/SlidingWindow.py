@@ -35,3 +35,28 @@ class SlidingWindow():
         y = self.last_pos[0]
         self.last_pos = (y,x)
         return img[y:y+self.wH,x:x+self.wW],[x,y,x+self.wW,y+self.wH]            #返回ROI区域    
+		
+	def nextWindowPosition(self):
+        if self.last_pos == (self.imgH-self.wH,self.imgW-self.wW): #如果遍历完成
+            return 0,0
+        
+        if self.last_pos[1] == self.imgW-self.wW:  #水平方向到顶
+            if self.last_pos[0]+self.vStride <=  self.imgH-self.wH:   #且换行后不超出图像范围
+                y = self.last_pos[0]+self.vStride                #换行扫描
+                x = 0
+            else:
+                y = self.imgH-self.wH
+                x = 0
+            
+            self.last_pos = (y,x)
+            return [x,y,x+self.wW,y+self.wH]            #返回ROI区域    
+
+        
+        if self.last_pos[1]+self.hStride <= self.imgW-self.wW: 
+            x = self.last_pos[1]+self.hStride
+        else:             #水平方向即将到顶
+            x = self.imgW-self.wW
+        
+        y = self.last_pos[0]
+        self.last_pos = (y,x)
+        return [x,y,x+self.wW,y+self.wH]            #返回ROI区域    

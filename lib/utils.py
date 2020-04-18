@@ -60,3 +60,38 @@ class faceDetector():
         
         return out[0]
 
+def NMS(box):
+    
+    if len(box) == 0:
+        return []
+    
+    #xmin, ymin, xmax, ymax, score, cropped_img, scale
+    box.sort(key=lambda x :x[4])
+    box.reverse()
+
+    pick = []
+    x_min = np.array([box[i][0] for i in range(len(box))],np.float32)
+    y_min = np.array([box[i][1] for i in range(len(box))],np.float32)
+    x_max = np.array([box[i][2] for i in range(len(box))],np.float32)
+    y_max = np.array([box[i][3] for i in range(len(box))],np.float32)
+
+    area = (x_max-x_min)*(y_max-y_min)
+    idxs = np.array(range(len(box)))
+
+    while len(idxs) > 0:
+        i = idxs[0]
+        pick.append(i)
+
+        xx1 = np.maximum(x_min[i],x_min[idxs[1:]])
+        yy1 = np.maximum(y_min[i],y_min[idxs[1:]])
+        xx2 = np.minimum(x_max[i],x_max[idxs[1:]])
+        yy2 = np.minimum(y_max[i],y_max[idxs[1:]])
+
+        w = np.maximum(xx2-xx1,0)
+        h = np.maximum(yy2-yy1,0)
+
+        overlap = (w*h)/(area[idxs[1:]] + area[i] - w*h)
+
+        idxs = np.delete(idxs, np.concatenate(([0],np.where(((overlap >= 0.5) & (overlap <= 1)))[0]+1)))
+    
+    return [box[i] for i in pick]
