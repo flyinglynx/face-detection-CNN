@@ -35,8 +35,9 @@ def loadImages(category,width,height,type_="gray"):
         
         if type_ == "RGB":
             img= np.vstack((img[:,:,0],img[:,:,1],img[:,:,2]))
-        elif type_ = "gray":
-            img = np.reshape(1,height,width)
+            img= img.reshape(3,height,width)
+        elif type_ == "gray":
+            img = img.reshape(1,height,width)
         images.append(img)
 
     return np.array(images)
@@ -57,6 +58,7 @@ class faceDetector():
             self.detectModel = self.detectModel.to(self.device)
     
     def detect(self,img):
+
         img = cv2.resize(img,(self.height,self.width),interpolation = cv2.INTER_AREA)
         img = img/255.0
         img = img.astype(np.float32)
@@ -84,18 +86,18 @@ class faceDetector():
         box = window.nextWindowPosition()
     
         while(box is not None):
-            x1,x2,y1,y2 = box
+            x1,y1,x2,y2 = box
             predict = self.detect(img[y1:y2,x1:x2])        
             if np.argmax(predict)==1:
-                boundingBox.append([x1,x2,y1,y2,predict[1]])
+                boundingBox.append([x1,y1,x2,y2,predict[1]])
             box = window.nextWindowPosition()
 		
-        box = NMS(box) #非极大值抑制，去除一些重叠的或是几率不高的bounding box
-        return box
+        boundingBox = NMS(boundingBox) #非极大值抑制，去除一些重叠的或是几率不高的bounding box
+        return boundingBox
 
 def NMS(box):
     
-    if len(box) == 0:
+    if box is None:
         return []
     
     #xmin, ymin, xmax, ymax, score, cropped_img, scale
@@ -130,9 +132,10 @@ def NMS(box):
     return [box[i] for i in pick]
 
 def darwBoundingBox(boxList,img,color=(0,255,0)):
-    
+    i = 0
+    copy = img.copy()
     for cords in boxList:
         x1,y1,x2,y2,s = cords
         img = cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0))
-    
+        cv2.imwrite("tempSample/negsample_3"+str(i)+".jpg",copy[y1:y2,x1:x2])        
     return img

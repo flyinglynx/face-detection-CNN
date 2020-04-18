@@ -18,17 +18,18 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 '''
 加载数据集(numpy数据类型)
 '''
-pos = utils.loadImages("positive",width=100,height=100)
-neg = utils.loadImages("negative",width=100,height=100)
+pos = utils.loadImages("positive",width=64,height=64,type_="RGB")
+neg = utils.loadImages("negative",width=64,height=64,type_="RGB")
+print("-------数据集装载完毕--------")
 
 pos_y = np.array([1]*pos.shape[0]).reshape((-1,1))
 neg_y = np.array([0]*neg.shape[0]).reshape((-1,1))
 
-train_x = np.vstack((pos[100:355,:,:],neg[100:1355,:,:]))
-val_x = np.vstack((pos[0:100,:,:],neg[0:100,:,:]))
+train_x = np.vstack((pos[100:355,:,:,:],neg[0:800,:,:,:]))
+val_x = np.vstack((pos[0:100,:,:,:],neg[800:1337,:,:,:]))
 
-train_y = np.vstack((pos_y[100:355],neg_y[100:1355]))
-val_y = np.vstack((pos_y[0:100],neg_y[0:100]))
+train_y = np.vstack((pos_y[100:355],neg_y[0:800]))
+val_y = np.vstack((pos_y[0:100],neg_y[800:1337]))
 
 train_y = train_y.astype(np.int64)  #需要把标签转换为long型整数
 val_y = val_y.astype(np.int64)
@@ -44,7 +45,7 @@ loader = DataLoader(dataset=trainingSet,batch_size=BATCH_SIZE,shuffle=True)
 '''
 开始训练
 '''
-model = cnn.forwardCNN().to(device)
+model = cnn.CNN_64().to(device)
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -95,4 +96,4 @@ with torch.no_grad():   #测试集中不需要计算梯度
     print('Accuracy : {} %'.format(100 * correct / total))
 
 if(input("save model? y/n:")=="y"):
-    torch.save(model,'trained_model/CNNmodel.pt')
+    torch.save(model,'trained_model/CNN64model.pt')

@@ -18,21 +18,9 @@ while(cap.isOpened()):#循环读取每一帧
     gray_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2GRAY)   #转换为灰度图做人脸检测
     h,w = gray_image.shape
     
-    window.resetWindow()
-    boundingBox = window.nextWindowPosition()
-    
-    while(boundingBox is not None):
-<<<<<<< HEAD
-        x1,y1,x2,y2 = boundingBox
-        predict = detector.detect(gray_image[y1:y2,x1:x2])        
-=======
-        predict = detector.detect()        
->>>>>>> ab4d9e5f9d8172563f5794dad6655aa1eca703c1
-        if np.argmax(predict)==1:
-            bgr_image = cv2.rectangle(bgr_image,(x1,y1),(x2,y2),(0,255,0))
-            #cv2.imshow("debug",ROI)
-        boundingBox = window.nextWindowPosition()
- 
+    boxes = detector.locateFace(gray_image)
+    utils.darwBoundingBox(boxes,bgr_image)
+
     cv2.imshow('detection result', bgr_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
