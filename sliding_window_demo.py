@@ -1,7 +1,9 @@
 import cv2
-from lib.utils import faceDetector
 import numpy as np
+
 import lib.SlidingWindow as sw
+from lib.utils import faceDetector
+import lib.utils as utils
 
 detector = faceDetector("trained_model/CNNmodel.pt",width=100,height=100)
 window = sw.SlidingWindow(imgW = 640,imgH = 480,wW = 200,wH = 200,vStride = 30,hStride=30)
@@ -17,14 +19,15 @@ while(cap.isOpened()):#循环读取每一帧
     h,w = gray_image.shape
     
     window.resetWindow()
-    ROI,cord = window.nextWindow(gray_image)
+    boundingBox = window.nextWindowPosition()
     
-    while(cord != 0):
-        predict = detector.detect(ROI)        
+    while(boundingBox is not None):
+        x1,y1,x2,y2 = boundingBox
+        predict = detector.detect(gray_image[y1:y2,x1:x2])        
         if np.argmax(predict)==1:
-            bgr_image = cv2.rectangle(bgr_image,(cord[0],cord[1]),(cord[2],cord[3]),(0,255,0))
+            bgr_image = cv2.rectangle(bgr_image,(x1,y1),(x2,y2),(0,255,0))
             #cv2.imshow("debug",ROI)
-        ROI,cord = window.nextWindow(gray_image)
+        boundingBox = window.nextWindowPosition()
  
     cv2.imshow('detection result', bgr_image)
     if cv2.waitKey(1) & 0xFF == ord('q'):

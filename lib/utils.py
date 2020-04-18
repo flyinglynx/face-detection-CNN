@@ -95,3 +95,11 @@ def NMS(box):
         idxs = np.delete(idxs, np.concatenate(([0],np.where(((overlap >= 0.5) & (overlap <= 1)))[0]+1)))
     
     return [box[i] for i in pick]
+
+def darwBoundingBox(boxList,img,color=(0,255,0)):
+    
+    for cords in boxList:
+        x1,y1,x2,y2,s = cords
+        img = cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0))
+    
+    return img
