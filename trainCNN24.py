@@ -25,11 +25,11 @@ print("-------数据集装载完毕--------")
 pos_y = np.array([1]*pos.shape[0]).reshape((-1,1))
 neg_y = np.array([0]*neg.shape[0]).reshape((-1,1))
 
-train_x = np.vstack((pos[100:355,:,:,:],neg[100:1355,:,:,:]))
-val_x = np.vstack((pos[0:100,:,:,:],neg[0:100,:,:,:]))
+train_x = np.vstack((pos[100:,:,:,:],neg[500:986,:,:,:]))
+val_x = np.vstack((pos[0:50,:,:,:],neg[0:500,:,:,:]))
 
-train_y = np.vstack((pos_y[100:355],neg_y[100:1355]))
-val_y = np.vstack((pos_y[0:100],neg_y[0:100]))
+train_y = np.vstack((pos_y[100:],neg_y[500:986]))
+val_y = np.vstack((pos_y[0:50],neg_y[0:500]))
 
 train_y = train_y.astype(np.int64)  #需要把标签转换为long型整数
 val_y = val_y.astype(np.int64)

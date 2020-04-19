@@ -46,14 +46,14 @@ def loadImages(category,width,height,type_="gray"):
 给出一张图片，判定是否为人脸
 '''
 class faceDetector():
-    def __init__(self,model_path,width=100,height=100,model_name="forward CNN"):
+    def __init__(self,model_path,width=64,height=64,model_name="CNN_64"):
         
         self.detectModel=None
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.height=height
         self.width = width
         self.slidingWindow = None
-        if model_name == "forward CNN":
+        if model_name == "CNN_64":
             self.detectModel = torch.load(model_path)
             self.detectModel = self.detectModel.to(self.device)
     
@@ -66,7 +66,7 @@ class faceDetector():
         with torch.no_grad():
             inputTensor = torch.from_numpy(img)
             inputTensor = inputTensor.to(self.device)
-            inputTensor= inputTensor.view(1,1,self.height,self.width)
+            inputTensor= inputTensor.view(1,3,self.height,self.width)
             
             out = self.detectModel(inputTensor)
             out = out.cpu()
@@ -77,16 +77,18 @@ class faceDetector():
 		#(self,imgW,imgH,wW=200,wH=200,vStride=50,hStride=50)
     def locateFace(self,img):
 	    #初始化滑窗检测器
-        h,w = img.shape
+        h,w,channel = img.shape
         window = sw.SlidingWindow(imgW = w,imgH = h,wW = 200,wH = 200,vStride = 30,hStride=30)
         window.resetWindow()
 		
 		#建立一个列表存储可能存在人脸的位置
         boundingBox = []
         box = window.nextWindowPosition()
-    
+        #i=0
         while(box is not None):
             x1,y1,x2,y2 = box
+            #cv2.imwrite("tempSample/n1sample"+str(i)+".jpg",img[y1:y2,x1:x2])
+            #i = i+1
             predict = self.detect(img[y1:y2,x1:x2])        
             if np.argmax(predict)==1:
                 boundingBox.append([x1,y1,x2,y2,predict[1]])
@@ -132,10 +134,7 @@ def NMS(box):
     return [box[i] for i in pick]
 
 def darwBoundingBox(boxList,img,color=(0,255,0)):
-    i = 0
-    copy = img.copy()
     for cords in boxList:
         x1,y1,x2,y2,s = cords
-        img = cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0))
-        cv2.imwrite("tempSample/negsample_3"+str(i)+".jpg",copy[y1:y2,x1:x2])        
+        img = cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0))        
     return img
