@@ -11,7 +11,7 @@ import lib.utils as utils
 '''
 BATCH_SIZE = 120
 LR = 0.001
-EPOCHS = 50
+EPOCHS = 20
 # Device configuration
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

@@ -75,10 +75,10 @@ class faceDetector():
         return out[0]
 	#def setSildingWindow(self,imgH,):
 		#(self,imgW,imgH,wW=200,wH=200,vStride=50,hStride=50)
-    def locateFace(self,img):
+    def locateFace(self,img,wW=200,wH=200):
 	    #初始化滑窗检测器
         h,w,channel = img.shape
-        window = sw.SlidingWindow(imgW = w,imgH = h,wW = 200,wH = 200,vStride = 30,hStride=30)
+        window = sw.SlidingWindow(imgW = w,imgH = h,wW = wW,wH = wH,vStride = 30,hStride=30)
         window.resetWindow()
 		
 		#建立一个列表存储可能存在人脸的位置

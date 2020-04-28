@@ -8,21 +8,25 @@ class CNN_24(nn.Module):
     def __init__(self):
         super(CNN_24, self).__init__()
 
-        self.conv1 = nn.Conv2d(3, 64, 5)
+        self.conv1 = nn.Conv2d(3, 64, 3)
+        self.conv2 = nn.Conv2d(64, 64, 3)
         self.norm1 = nn.BatchNorm2d(64)		
-        self.fc1 = nn.Linear(64 * 10* 10, 120)  # 6*6 from image dimension
-        self.fc2 = nn.Linear(120, 10)
+        self.fc1 = nn.Linear(64 *11* 11, 100)  # 6*6 from image dimension
+        self.fc2 = nn.Linear(100, 10)
         self.fc3 = nn.Linear(10, 2)
+        self.dropout = nn.Dropout2d(p=0.3, inplace=False)
 
     def forward(self, x):
         # Max pooling over a (2, 2) window
         x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
+        x = self.dropout(x)
+        x = self.norm1(x)
+        F.relu(self.conv2(x))
         x = self.norm1(x)
         x = x.view(-1, self.num_flat_features(x))
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-        x = F.softmax(x,1)
         return x
 
     def num_flat_features(self, x):
@@ -30,6 +34,7 @@ class CNN_24(nn.Module):
         num_features = 1
         for s in size:
             num_features *= s
+   
         return num_features
 
 #级联CNN中最前面的中间级
@@ -63,7 +68,6 @@ class CNN_64(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
-        x = F.softmax(x,2)
         return x
 
     def num_flat_features(self, x):

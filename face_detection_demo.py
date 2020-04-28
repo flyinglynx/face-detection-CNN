@@ -2,8 +2,8 @@ import cv2
 from lib.utils import faceDetector
 import numpy as np
 
-#faceDetector = faceDetector("trained_model/CNN64model.pt",width=64,height=64)
-faceDetector = faceDetector("trained_model/CNN24model.pt",width=24,height=24)
+faceDetector = faceDetector("trained_model/CNN64model.pt",width=64,height=64)
+#faceDetector = faceDetector("trained_model/CNN24model.pt",width=24,height=24)
 cap = cv2.VideoCapture(0) #创建一个 VideoCapture 对象 
 
 count = 0
@@ -14,7 +14,7 @@ while(cap.isOpened()):#循环读取每一帧
     h,w,c = bgr_image.shape
         
     ROI = bgr_image[int(h/2)-100:int(h/2)+100,int(w/2)-100:int(w/2)+100,:]
-    cv2.imwrite("tempSample/pos_batch2_"+str(count)+".jpg",bgr_image[int(h/2)-100:int(h/2)+100,int(w/2)-100:int(w/2)+100,:])
+    #cv2.imwrite("tempSample/pos_batch2_"+str(count)+".jpg",bgr_image[int(h/2)-100:int(h/2)+100,int(w/2)-100:int(w/2)+100,:])
     count=count+1
     #cv2.waitKey(0)
     #cv2.imwrite("new_pos_sample/pd_"+str(count)+".jpg",bgr_image[int(h/2)-100:int(h/2)+100,int(w/2)-100:int(w/2)+100,:])
